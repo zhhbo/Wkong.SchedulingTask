@@ -1,0 +1,96 @@
+﻿@model Wkong.SchedulingTask.ViewModels.SchedulingTaskViewModel
+@{
+    Layout.Title = T("修改计划任务");
+    Style.Require("DateTimeEditor");
+    Style.Require("jQueryCalendars_Picker");
+    Style.Require("jQueryUI_Calendars_Picker");
+    Style.Require("jQueryTimeEntry");
+    Style.Require("jQueryDateTimeEditor");
+
+    Script.Require("jQueryCalendars_All").AtFoot();
+    Script.Require("jQueryCalendars_Picker_Ext").AtFoot();
+    Script.Require("jQueryTimeEntry").AtFoot();
+}
+@using (Html.BeginFormAntiForgeryPost())
+{
+    @Html.ValidationSummary()
+
+
+    <fieldset>
+        <legend>@T("设置")</legend>
+    </fieldset>
+    <fieldset>
+        <div>
+            <strong>编辑任务：</strong>
+            @Html.HiddenFor(m => m.Id)
+            <div>
+                <label for="@Html.FieldIdFor(m => m.Priority)">优先级</label>
+                @Html.RadioButtonFor(model => model.Priority, -50) 低
+                @Html.RadioButtonFor(model => model.Priority, 0) 一般
+                @Html.RadioButtonFor(model => model.Priority, 50) 高
+                <span class="hint">                </span>
+            </div>
+            <div>
+                <label for="@Html.FieldIdFor(m => m.TaskName)">任务名称</label>
+                @Html.EditorFor(m => m.TaskName)
+                <span class="hint">                </span>
+            </div>
+            <div>
+                <label for="@Html.FieldIdFor(m => m.Frequency)">执行频次</label>
+                @Html.RadioButtonFor(model => model.Frequency, -2) 分
+               @Html.RadioButtonFor(model => model.Frequency, -1) 时
+                @Html.RadioButtonFor(model => model.Frequency, 0) 仅一次
+                @Html.RadioButtonFor(model => model.Frequency, 1) 日
+                @Html.RadioButtonFor(model => model.Frequency, 2) 周
+                @Html.RadioButtonFor(model => model.Frequency, 3) 月
+
+                <span class="hint">                </span>
+            </div>
+            <div>
+                <label for="@Html.FieldIdFor(m => m.SpaceNum)">间隔长度</label>
+                @Html.EditorFor(m => m.SpaceNum)
+                <span class="hint">                </span>
+            </div>
+
+
+            <div>
+                <span class="hint">首次执行时间 </span>
+                <label class="forpicker" for="@Html.FieldIdFor(m => Model.Date)">日期</label>
+                <span class="date">@Html.TextBoxFor(m => m.Date, new { placeholder = "日期" })</span>
+
+                <label class="forpicker" for="@Html.FieldIdFor(m => Model.Time)">时间</label>
+                <span class="time">@Html.TextBoxFor(m => m.Time, new { placeholder = "时间" })</span>
+            </div>
+        </div>
+    </fieldset>
+
+    <button class="primaryAction" type="submit" name="submit.Save" value="@T("保存设置")">@T("保存设置")</button>
+
+}
+@using (Script.Foot())
+{
+
+    @* Generate the localization scripts. *@
+
+     @Display.CalendarsPickerLocalization() 
+
+    @Display.TimeEntryLocalization() 
+     <script type="text/javascript">
+        //<![CDATA[
+        $(function () {
+
+                $("#@Html.FieldIdFor(m => Model.Date)").calendarsPicker({
+                    showAnim: "",
+                    renderer: $.extend({}, $.calendarsPicker.themeRollerRenderer, {
+                        picker: "<div {popup:start} id='ui-datepicker-div'{popup:end} class='ui-datepicker ui-widget ui-widget-content ui-helper-clearfix ui-corner-all{inline:start} ui-datepicker-inline{inline:end}'><div class='ui-datepicker-header ui-widget-header ui-helper-clearfix ui-corner-all'>{link:prev}{link:today}{link:next}</div>{months}{popup:start}{popup:end}<div class='ui-helper-clearfix'></div></div>",
+                        month: "<div class='ui-datepicker-group'><div class='ui-datepicker-month ui-helper-clearfix'>{monthHeader:MM yyyy}</div><table class='ui-datepicker-calendar'><thead>{weekHeader}</thead><tbody>{weeks}</tbody></table></div>"
+                    })
+                });
+
+                $("#@Html.FieldIdFor(m => Model.Time)").timeEntry();
+
+
+        });
+        //]]>
+                                                        </script>
+}

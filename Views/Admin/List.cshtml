@@ -1,0 +1,75 @@
+﻿@using Orchard.Localization
+@using Wkong.SchedulingTask.Models
+@using Orchard.Utility.Extensions
+@{
+    IEnumerable<SchedulingTaskRecord> jobs = Model.Jobs;
+
+    Layout.Title = T("计划任务");
+Script.Require("jQuery");
+ Script.Require("jQueryUI_Dialog");
+ Style.Require("jQueryUI_Orchard");
+ }
+@using (Html.BeginFormAntiForgeryPost())
+{
+    <div class="manage">
+        <a href="@Url.Action("AddTask", "Admin" , new {  area="Wkong.SchedulingTask" })">添加任务</a>
+    </div>
+    if (!jobs.Any())
+    {
+    <div class="job info">@T("没有任务.")</div>
+}
+else {
+    <table class="items">
+        <thead>
+            <tr>
+                <th>@T("优先级")</th>
+                <th>@T("任务名")</th>
+                <th>@T("创建时间")</th>
+                <th>@T("计划执行时间")</th>
+                <th>@T("操作")</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var job in jobs) {
+                LocalizedString priorityName;
+                switch (job.Priority) {
+                    case -50:
+                        priorityName = T("低");
+                        break;
+                    case 0:
+                        priorityName = T("一般");
+                        break;
+                    case 50:
+                        priorityName = T("高");
+                        break;
+                    default:
+                        priorityName = T("一般");
+                        break;
+                }
+                <tr>
+                    <td>@priorityName</td>
+                    <td>@job.TaskName</td>
+                    <td>@Display.DateTimeRelative(DateTimeUtc: job.CreatedUtc)</td>
+                    <td>@Display.DateTimeRelative(DateTimeUtc: job.ScheduledUtc)</td>
+                    <td>
+                        <a href='javascript:$("#Job-@job.Id").dialog({ title:"@job.TaskName 详细参数" })'>@T("详细参数")</a>
+                        <a href="@Url.Action("EditTaskParameters", "Admin", new { job.Id, area = "Wkong.SchedulingTask" })">配置参数</a>
+                        <a href="@Url.Action("EditTask", "Admin", new { job.Id, area = "Wkong.SchedulingTask" })">修改</a>
+                        @if (job.CanExecute)
+                        {
+                            <a href="@Url.Action("PauseTask", "Admin", new { job.Id, area = "Wkong.SchedulingTask" })">暂停</a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("ResumeTask", "Admin", new { job.Id, area = "Wkong.SchedulingTask" })">执行</a>
+
+                        }
+                        <div id="Job-@job.Id" style="display: none;">类型：@job.Message <br/>参数： @Html.Raw(job.Parameters)</div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    }
+    @Display(Model.Pager)
+}

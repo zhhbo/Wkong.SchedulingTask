@@ -1,0 +1,22 @@
+﻿@using System.Web;
+@{
+    Layout.Title = @T("设置参数");
+    //var state = HttpUtility.UrlEncode(HttpUtility.HtmlEncode(((string)Model.State).Replace("\"", "'"))); 
+}
+
+@Html.ValidationSummary()
+
+@using (Html.BeginFormAntiForgeryPost()) {
+
+    @* Render the dynamic form *@    
+    if (Model.Form != null) {
+        <fieldset>
+            @DisplayChildren(Model.Form)
+        </fieldset>
+    }
+    @Display.TokenHint()
+
+<fieldset>
+    <button class="primaryAction" type="submit" name="_submit.Save" value="@T("Save")">@T("Save")</button>
+</fieldset>
+}
